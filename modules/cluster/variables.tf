@@ -71,12 +71,6 @@ variable "spot_price" {
   default     = "0.1"
 }
 
-variable "node_groups" {
-  description = "List of node groups to be created"
-  type        = any
-  default     = {}
-}
-
 variable "node_group_ami" {
   description = "ami type for the node group worker intances"
   type        = string
@@ -293,18 +287,6 @@ variable "create_vpc" {
   default     = true
 }
 
-variable "vpc_id" {
-  description = "The VPC to create EKS cluster in if create_vpc is false"
-  type        = string
-  default     = ""
-}
-
-variable "subnets" {
-  description = "The subnet ids to create EKS cluster in if create_vpc is false"
-  type        = list(string)
-  default     = []
-}
-
 variable "encrypt_volume_self" {
   description = "Encrypt the ebs and root volume for the self managed worker nodes. This is only valid for the worker group launch template"
   type        = bool
@@ -354,18 +336,6 @@ variable "create_autoscaler_role" {
   description = "Flag to control cluster autoscaler iam role creation"
   type        = bool
   default     = true
-}
-
-variable "create_ssm_role" {
-  description = "Flag to control AWS Parameter Store iam roles creation"
-  type        = bool
-  default     = false
-}
-
-variable "create_asm_role" {
-  description = "Flag to control AWS Secrets Manager iam roles creation"
-  type        = bool
-  default     = false
 }
 
 variable "create_pipeline_vis_role" {

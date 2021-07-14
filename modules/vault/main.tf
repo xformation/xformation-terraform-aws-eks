@@ -2,8 +2,6 @@
 // If the Vault IAM user does exist create one
 // See https://www.terraform.io/docs/providers/aws/r/iam_user.html
 // ----------------------------------------------------------------------------
-
-data "aws_partition" "current" {}
 locals {
   encryption_algo = var.use_kms_s3 ? "aws:kms" : "AES256"
 }
@@ -36,7 +34,7 @@ data "aws_iam_user" "vault_user" {
 resource "aws_s3_bucket" "vault-unseal-bucket" {
   count = local.create_vault_resources ? 1 : 0
 
-  bucket_prefix = "vault-unseal-${lower(var.cluster_name)}-"
+  bucket_prefix = "vault-unseal-${var.cluster_name}-"
   acl           = "private"
   tags = {
     Name = "Vault unseal bucket"
@@ -82,13 +80,6 @@ resource "aws_dynamodb_table" "vault-dynamodb-table" {
   tags = {
     Name = "vault-dynamo-db-table"
   }
-
-  lifecycle {
-    ignore_changes = [
-      read_capacity,
-      write_capacity
-    ]
-  }
 }
 
 // ----------------------------------------------------------------------------
@@ -110,8 +101,7 @@ resource "aws_kms_key" "kms_vault_unseal" {
             "Principal": {
                 "AWS": [
                     "${length(data.aws_iam_user.vault_user) > 0 ? data.aws_iam_user.vault_user[0].arn : ""}",
-                    "${data.aws_caller_identity.current.arn}",
-                    "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:root"
+                    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
                 ]
             },
             "Action": "kms:*",

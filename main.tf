@@ -1,6 +1,10 @@
 // ----------------------------------------------------------------------------
 // Configure providers
 // ----------------------------------------------------------------------------
+provider "aws" {
+  region = var.region
+}
+
 provider "helm" {
   kubernetes {
     host                   = module.cluster.cluster_host
@@ -35,15 +39,12 @@ module "cluster" {
   region                                = var.region
   create_eks                            = var.create_eks
   create_vpc                            = var.create_vpc
-  vpc_id                                = var.vpc_id
-  subnets                               = var.subnets
   cluster_name                          = local.cluster_name
   cluster_version                       = var.cluster_version
   desired_node_count                    = var.desired_node_count
   min_node_count                        = var.min_node_count
   max_node_count                        = var.max_node_count
   node_machine_type                     = var.node_machine_type
-  node_groups                           = var.node_groups_managed
   spot_price                            = var.spot_price
   encrypt_volume_self                   = var.encrypt_volume_self
   vpc_name                              = var.vpc_name
@@ -89,8 +90,6 @@ module "cluster" {
   create_ctrlb_role                     = var.create_ctrlb_role
   create_exdns_role                     = var.create_exdns_role
   create_pipeline_vis_role              = var.create_pipeline_vis_role
-  create_asm_role                       = var.create_asm_role
-  create_ssm_role                       = var.create_ssm_role
   create_tekton_role                    = var.create_tekton_role
   additional_tekton_role_policy_arns    = var.additional_tekton_role_policy_arns
 }
@@ -106,7 +105,6 @@ module "vault" {
   force_destroy  = var.force_destroy
   external_vault = local.external_vault
   use_vault      = var.use_vault
-  region         = var.region
 }
 
 // ----------------------------------------------------------------------------
@@ -132,7 +130,6 @@ module "dns" {
   tls_email                      = var.tls_email
   enable_external_dns            = var.enable_external_dns
   create_and_configure_subdomain = var.create_and_configure_subdomain
-  force_destroy_subdomain        = var.force_destroy_subdomain
   enable_tls                     = var.enable_tls
   production_letsencrypt         = var.production_letsencrypt
   manage_apex_domain             = var.manage_apex_domain
@@ -143,16 +140,4 @@ module "health" {
   source               = "./modules/health"
   is_jx2               = var.is_jx2
   install_kuberhealthy = var.install_kuberhealthy
-}
-
-module "nginx" {
-  source                 = "./modules/nginx"
-  is_jx2                 = var.is_jx2
-  create_nginx           = var.create_nginx
-  nginx_release_name     = var.nginx_release_name
-  nginx_namespace        = var.nginx_namespace
-  nginx_chart_version    = var.nginx_chart_version
-  create_nginx_namespace = var.create_nginx_namespace
-  nginx_values_file      = var.nginx_values_file
-
 }

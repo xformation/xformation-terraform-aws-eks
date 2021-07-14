@@ -1,8 +1,3 @@
-// VPC
-output "vpc_id" {
-  value = module.eks-jx.vpc_id
-}
-
 // Vault
 output "vault_user_id" {
   value       = module.eks-jx.vault_user_id
@@ -12,7 +7,6 @@ output "vault_user_id" {
 output "vault_user_secret" {
   value       = module.eks-jx.vault_user_secret
   description = "The Vault IAM user secret"
-  sensitive   = true
 }
 
 output "vault_unseal_bucket" {

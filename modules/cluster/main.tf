@@ -60,16 +60,16 @@ module "vpc" {
 // ----------------------------------------------------------------------------
 module "eks" {
   source          = "terraform-aws-modules/eks/aws"
-  version         = ">= 14.0, < 16.0"
+  version         = "~> 14.0"
   create_eks      = var.create_eks
   cluster_name    = var.cluster_name
   cluster_version = var.cluster_version
-  subnets         = var.create_vpc ? (var.cluster_in_private_subnet ? module.vpc.private_subnets : module.vpc.public_subnets) : var.subnets
-  vpc_id          = var.create_vpc ? module.vpc.vpc_id : var.vpc_id
+  subnets         = (var.cluster_in_private_subnet ? module.vpc.private_subnets : module.vpc.public_subnets)
+  vpc_id          = module.vpc.vpc_id
   enable_irsa     = true
 
   worker_groups_launch_template = var.enable_worker_group && var.enable_worker_groups_launch_template ? [
-    for subnet in(var.create_vpc ? module.vpc.public_subnets : var.subnets) :
+    for subnet in module.vpc.public_subnets :
     {
       subnets                 = [subnet]
       asg_desired_capacity    = var.lt_desired_nodes_per_subnet
@@ -123,20 +123,36 @@ module "eks" {
     }
   ] : []
 
-  node_groups = !var.enable_worker_group ? local.node_groups_extended : {}
+  node_groups = !var.enable_worker_group ? {
+    eks-jx-node-group = {
+      ami_type         = var.node_group_ami
+      disk_size        = var.node_group_disk_size
+      desired_capacity = var.desired_node_count
+      max_capacity     = var.max_node_count
+      min_capacity     = var.min_node_count
+
+      instance_type = var.node_machine_type
+      k8s_labels = {
+        "jenkins-x.io/name"       = var.cluster_name
+        "jenkins-x.io/part-of"    = "jx-platform"
+        "jenkins-x.io/managed-by" = "terraform"
+      }
+      additional_tags = {
+        aws_managed = "true"
+      }
+    }
+  } : {}
 
   workers_additional_policies = [
-    "arn:${data.aws_partition.current.partition}:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser"
+    "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser"
   ]
 
-  map_users                             = var.map_users
-  map_roles                             = var.map_roles
-  map_accounts                          = var.map_accounts
-  cluster_endpoint_private_access       = var.cluster_endpoint_private_access
-  cluster_endpoint_public_access        = var.cluster_endpoint_public_access
-  cluster_endpoint_private_access_cidrs = var.cluster_endpoint_private_access_cidrs
-  cluster_endpoint_public_access_cidrs  = var.cluster_endpoint_public_access_cidrs
-  cluster_encryption_config             = var.cluster_encryption_config
+  map_users                       = var.map_users
+  map_roles                       = var.map_roles
+  map_accounts                    = var.map_accounts
+  cluster_endpoint_private_access = var.cluster_endpoint_private_access
+  cluster_endpoint_public_access  = var.cluster_endpoint_public_access
+  cluster_encryption_config       = var.cluster_encryption_config
 }
 
 // ----------------------------------------------------------------------------

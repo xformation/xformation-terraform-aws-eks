@@ -29,15 +29,8 @@ output "lts_repository_bucket" {
   description = "The bucket that will serve as artifacts repository"
 }
 
-// VPC
-
-output "vpc_id" {
-  value       = module.cluster.vpc_id
-  description = "The ID of the VPC"
-}
-
 // ----------------------------------------------------------------------------
-// Cluster
+// Cluster Name
 // ----------------------------------------------------------------------------
 output "cluster_name" {
   value       = local.cluster_name
@@ -49,10 +42,6 @@ output "cluster_oidc_issuer_url" {
   description = "The Cluster OIDC Issuer URL"
 }
 
-output "eks_module" {
-  value       = module.cluster.eks_module
-  description = "The output of the terraform-aws-modules/eks/aws module for use in terraform"
-}
 
 // ----------------------------------------------------------------------------
 // Generated IAM Roles
@@ -90,16 +79,6 @@ output "cluster_autoscaler_iam_role" {
 output "pipeline_viz_iam_role" {
   value       = module.cluster.pipeline_viz_iam_role
   description = "The IAM Role that the pipeline visualizer pod will assume to authenticate"
-}
-
-output "cluster_asm_iam_role" {
-  value       = module.cluster.cluster_asm_iam_role
-  description = "The IAM Role that the External Secrets pod will assume to authenticate (Secrets Manager)"
-}
-
-output "cluster_ssm_iam_role" {
-  value       = module.cluster.cluster_ssm_iam_role
-  description = "The IAM Role that the External Secrets pod will assume to authenticate (Parameter Store)"
 }
 
 // ----------------------------------------------------------------------------

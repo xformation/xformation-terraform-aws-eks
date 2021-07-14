@@ -16,6 +16,7 @@ variable "cluster_name" {
 variable "cluster_version" {
   description = "Kubernetes version to use for the EKS cluster."
   type        = string
+  default     = "1.17"
 }
 
 // ----------------------------------------------------------------------------
@@ -109,12 +110,6 @@ variable "node_group_disk_size" {
   description = "node group worker disk size"
   type        = string
   default     = "50"
-}
-
-variable "node_groups_managed" {
-  description = "List of managed node groups to be created and their respective settings"
-  type        = any
-  default     = { eks-jx-node-group = {} }
 }
 
 variable "key_name" {
@@ -229,12 +224,6 @@ variable "enable_external_dns" {
 
 variable "create_and_configure_subdomain" {
   description = "Flag to create an NS record set for the subdomain in the apex domain's Hosted Zone"
-  type        = bool
-  default     = false
-}
-
-variable "force_destroy_subdomain" {
-  description = "Flag to determine whether subdomain zone get forcefully destroyed. If set to false, empty the sub domain first in the aws Route 53 console, else terraform destroy will fail with HostedZoneNotEmpty error"
   type        = bool
   default     = false
 }
@@ -430,18 +419,6 @@ variable "create_vpc" {
   default     = true
 }
 
-variable "vpc_id" {
-  description = "The VPC to create EKS cluster in if create_vpc is false"
-  type        = string
-  default     = ""
-}
-
-variable "subnets" {
-  description = "The subnet ids to create EKS cluster in if create_vpc is false"
-  type        = list(string)
-  default     = []
-}
-
 variable "use_vault" {
   description = "Flag to control vault resource creation"
   type        = bool
@@ -511,18 +488,6 @@ variable "create_autoscaler_role" {
   default     = true
 }
 
-variable "create_ssm_role" {
-  description = "Flag to control AWS Parameter Store iam roles creation"
-  type        = bool
-  default     = false
-}
-
-variable "create_asm_role" {
-  description = "Flag to control AWS Secrets Manager iam roles creation"
-  type        = bool
-  default     = false
-}
-
 variable "create_velero_role" {
   description = "Flag to control velero iam role creation"
   type        = bool
@@ -557,39 +522,4 @@ variable "additional_tekton_role_policy_arns" {
   description = "Additional Policy ARNs to attach to Tekton IRSA Role"
   type        = list(string)
   default     = []
-}
-
-variable "create_nginx" {
-  default     = false
-  type        = bool
-  description = "Decides whether we want to create nginx resources using terraform or not"
-}
-
-variable "nginx_release_name" {
-  default     = "nginx-ingress"
-  type        = string
-  description = "Name of the nginx release name"
-}
-
-variable "nginx_namespace" {
-  default     = "nginx"
-  type        = string
-  description = "Name of the nginx namespace"
-}
-
-variable "nginx_chart_version" {
-  type        = string
-  description = "nginx chart version"
-}
-
-variable "create_nginx_namespace" {
-  default     = true
-  type        = bool
-  description = "Boolean to control nginx namespace creation"
-}
-
-variable "nginx_values_file" {
-  default     = "nginx_values.yaml"
-  type        = string
-  description = "Name of the values file which holds the helm chart values"
 }

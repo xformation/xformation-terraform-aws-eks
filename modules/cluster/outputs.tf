@@ -1,7 +1,3 @@
-output "vpc_id" {
-  value       = var.create_vpc ? module.vpc.vpc_id : var.vpc_id
-  description = "The ID of the VPC"
-}
 
 output "jx_namespace" {
   value = kubernetes_namespace.jx
@@ -25,11 +21,6 @@ output "cluster_ca_certificate" {
 
 output "cluster_token" {
   value = data.aws_eks_cluster_auth.cluster.token
-}
-
-output "eks_module" {
-  value       = module.eks
-  description = "The output of the terraform-aws-modules/eks/aws module for use in terraform"
 }
 
 // ----------------------------------------------------------------------------
@@ -63,16 +54,6 @@ output "tekton_bot_iam_role" {
 output "external_dns_iam_role" {
   value       = module.iam_assumable_role_external_dns.this_iam_role_name
   description = "The IAM Role that the External DNS pod will assume to authenticate"
-}
-
-output "cluster_asm_iam_role" {
-  value       = module.iam_assumable_role_secrets-secrets-manager.this_iam_role_name
-  description = "The IAM Role that the External Secrets pod will assume to authenticate (Secrets Manager)"
-}
-
-output "cluster_ssm_iam_role" {
-  value       = module.iam_assumable_role_secrets-system-manager.this_iam_role_name
-  description = "The IAM Role that the External Secrets pod will assume to authenticate (Parameter Store)"
 }
 
 output "cm_cainjector_iam_role" {
